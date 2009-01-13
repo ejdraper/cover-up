@@ -17,12 +17,14 @@ module CoverUp
     
     # This calculates the overall hit percentage for the run
     def hit_percentage
+      return 0 if self.lines.to_f == 0.0
       hit = self.files.collect { |f| f.hit }.flatten
       (hit.length.to_f / self.lines.to_f) * 100.0
     end
     
     # This calculates the overall miss percentage for the run
     def missed_percentage
+      return 0 if self.lines.to_f == 0.0
       missed = self.files.collect { |f| f.missed }.flatten
       (missed.length.to_f / self.lines.to_f) * 100.0
     end
