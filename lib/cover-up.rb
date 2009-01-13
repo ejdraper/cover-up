@@ -48,11 +48,13 @@ module CoverUp
     
     # This calculates the percentage of lines that were hit by the code being covered
     def hit_percentage
+      return 0 if self.lines.to_f == 0.0
       (self.hit.length.to_f / self.lines.to_f) * 100.0
     end
     
     # This calculates the percentage of lines that were missed by the code being covered
     def missed_percentage
+      return 0 if self.lines.to_f == 0.0
       (self.missed.length.to_f / self.lines.to_f) * 100.0
     end
   end
