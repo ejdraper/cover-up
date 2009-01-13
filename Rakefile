@@ -22,3 +22,8 @@ end
 Rake::GemPackageTask.new(spec) do |pkg|
   pkg.need_tar = true
 end
+
+desc "This runs the tests for the gem"
+task :test do
+  Dir.glob(File.join(File.dirname(__FILE__), "tests", "*_tests.rb")).each { |f| require f }
+end
