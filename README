@@ -1,0 +1,12 @@
+cover-up: a dynamic coverage tool for Ruby code
+
+Usage:
+
+	gem "cover-up"
+	require "cover-up"
+	
+	results = coverage(:include => "app/*/**.rb") do
+		run_tests
+	end
+	
+	results # this now contains coverage results based on the input pattern filter, and the Ruby code being executed
