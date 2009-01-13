@@ -111,7 +111,7 @@ def coverage(options = {}, &block)
       # If the line is a comment or an empty line, or it's the last line and it's "end", it's excluded
       if line.strip[0...1] == "#" || line.strip.empty? || (number == lines.length && line.strip == "end")
         excluded << number
-      elsif trace[file].include?(number)
+      elsif (trace[file] || []).include?(number)
         # Otherwise, if it was in the trace, it was hit
         hit << number
       else
