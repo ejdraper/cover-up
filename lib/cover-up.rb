@@ -57,14 +57,14 @@ module CoverUp
     
     # This calculates the percentage of lines that were hit by the code being covered
     def hit_percentage
-      return 0 if self.lines_with_exclusions.to_f == 0.0
-      (self.hit.length.to_f / self.lines_with_exclusions.to_f) * 100.0
+      return 0 if self.lines_without_exclusions.to_f == 0.0
+      (self.hit.length.to_f / self.lines_without_exclusions.to_f) * 100.0
     end
     
     # This calculates the percentage of lines that were missed by the code being covered
     def missed_percentage
-      return 0 if self.lines_with_exclusions.to_f == 0.0
-      (self.missed.length.to_f / self.lines_with_exclusions.to_f) * 100.0
+      return 0 if self.lines_without_exclusions.to_f == 0.0
+      (self.missed.length.to_f / self.lines_without_exclusions.to_f) * 100.0
     end
   end
 end
@@ -77,6 +77,8 @@ def coverage(options = {}, &block)
   trace = {}
   # Let's set a trace function so that every method call can be tracked
   set_trace_func(proc do |event, file, line, id, binding, klass|
+    # We log the line, if we were given a logger block that can deal with it
+    options[:logger].call(event, file, line, id, binding, klass) unless options[:logger].nil?
     # We unify the filename to it's absolute path
     file = File.expand_path(file)
     # Add the line number that was hit for this file, if it hasn't already been hit

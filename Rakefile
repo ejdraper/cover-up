@@ -9,7 +9,7 @@ require "rake/gempackagetask"
 # Define the cover-up gem spec
 spec = Gem::Specification.new do |s|
   s.name = "cover-up"
-  s.version = "0.1"
+  s.version = "0.2"
   s.author = "El Draper"
   s.email = "el@ejdraper.com"
   s.homepage = "http://github.com/edraper/cover-up"

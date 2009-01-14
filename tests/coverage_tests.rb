@@ -12,6 +12,8 @@ class CoverageTests < Test::Unit::TestCase
     assert_equal 4, file.hit.length
     assert_equal 6, file.missed.length
     assert_equal 6, file.excluded.length
+    assert_equal 40, file.hit_percentage.to_i
+    assert_equal 60, file.missed_percentage.to_i
     
     assert_equal 10, results.lines_without_exclusions
     assert_equal 16, results.lines
@@ -31,6 +33,8 @@ class CoverageTests < Test::Unit::TestCase
     assert_equal 4, file.hit.length
     assert_equal 6, file.missed.length
     assert_equal 6, file.excluded.length
+    assert_equal 40, file.hit_percentage.to_i
+    assert_equal 60, file.missed_percentage.to_i
     
     assert_equal 10, results.lines_without_exclusions
     assert_equal 16, results.lines
@@ -51,6 +55,8 @@ class CoverageTests < Test::Unit::TestCase
     assert_equal 6, file.hit.length
     assert_equal 4, file.missed.length
     assert_equal 6, file.excluded.length
+    assert_equal 60, file.hit_percentage.to_i
+    assert_equal 40, file.missed_percentage.to_i
 
     assert_equal 10, results.lines_without_exclusions
     assert_equal 16, results.lines
@@ -72,6 +78,8 @@ class CoverageTests < Test::Unit::TestCase
     assert_equal 8, file.hit.length
     assert_equal 2, file.missed.length
     assert_equal 6, file.excluded.length
+    assert_equal 80, file.hit_percentage.to_i
+    assert_equal 20, file.missed_percentage.to_i
 
     assert_equal 10, results.lines_without_exclusions
     assert_equal 16, results.lines
@@ -94,11 +102,37 @@ class CoverageTests < Test::Unit::TestCase
     assert_equal 10, file.hit.length
     assert_equal 0, file.missed.length
     assert_equal 6, file.excluded.length
+    assert_equal 100, file.hit_percentage.to_i
+    assert_equal 0, file.missed_percentage.to_i
 
     assert_equal 10, results.lines_without_exclusions
     assert_equal 16, results.lines
     assert_equal 100, results.hit_percentage.to_i
     assert_equal 0, results.missed_percentage.to_i
+  end
+  
+  # This tests the logger option available in CoverUp to log the tracing function
+  def test_logger
+    files = {}
+    klasses = []
+    logger = Proc.new do |event, file, line, id, binding, klass|
+      file = File.expand_path(file)
+      files[file] ||= []
+      files[file] << line
+      files[file].uniq!
+      klasses << klass
+    end
+    coverage(:include => test_filename, :logger => logger) do
+      load test_filename
+    end
+    
+    assert_equal 3, files.length
+    assert_equal "coverage_tests.rb", File.basename(files.keys[0])
+    assert_equal 4, files[files.keys[0]].length
+    assert_equal "test_code.rb", File.basename(files.keys[1])
+    assert_equal 4, files[files.keys[1]].length
+    assert_equal "cover-up.rb", File.basename(files.keys[2])
+    assert_equal 3, files[files.keys[2]].length
   end
 
   private
