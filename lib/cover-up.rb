@@ -77,13 +77,12 @@ def coverage(options = {}, &block)
   trace = {}
   # Let's set a trace function so that every method call can be tracked
   set_trace_func(proc do |event, file, line, id, binding, klass|
+    # Ignore certain trace events that we aren't interested in
+    next if event == 'c-call' || event == 'c-return' || event == 'class' || event == 'end'
     # We log the line, if we were given a logger block that can deal with it
     options[:logger].call(event, file, line, id, binding, klass) unless options[:logger].nil?
-    # We unify the filename to it's absolute path
-    file = File.expand_path(file)
-    # Add the line number that was hit for this file, if it hasn't already been hit
-    trace[file] ||= []
-    trace[file] << line unless trace[file].include?(line)
+    # Add the line number that was hit for this file
+    (trace[file] ||= []) << line
   end)
   # Now that we've set up the trace function, we can execute the code (trapping any exceptions)
   begin
@@ -93,6 +92,12 @@ def coverage(options = {}, &block)
   end
   # Once that's run, we stop the trace function
   set_trace_func(nil)
+  # Now let's expand upon any paths in the trace, and make sure we remove duplicate lines
+  coverage = {}
+  trace.keys.each do |key|
+    coverage[File.expand_path(key)] = trace[key].uniq
+  end
+  trace = nil
   # Now we collate the results
   results = []
   # Loop through all files
@@ -113,7 +118,7 @@ def coverage(options = {}, &block)
       # If the line is a comment or an empty line, or it's the last line and it's "end", it's excluded
       if line.strip[0...1] == "#" || line.strip.empty? || (number == lines.length && line.strip == "end")
         excluded << number
-      elsif (trace[file] || []).include?(number)
+      elsif (coverage[file] || []).include?(number)
         # Otherwise, if it was in the trace, it was hit
         hit << number
       else
