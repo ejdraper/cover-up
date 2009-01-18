@@ -10,3 +10,23 @@ Usage:
 	end
 	
 	results # this now contains coverage results based on the input pattern filter, and the Ruby code being executed
+	
+You can also optionally run your own logger inside the code coverage execution, for example:
+
+	logger = Proc.new do |event, file, line, id, binding, klass|
+	  puts "#{file} (#{line}): #{event}"
+    end
+
+    results = coverage(:include => "app/*/**.rb", :logger => logger) do
+		run_tests
+    end
+
+This will print out trace logging information from the code coverage run to the console, similar to the following:
+
+/path/cover-up/tests/../lib/cover-up.rb (89): line
+/path/cover-up/tests/coverage_tests.rb (127): line
+/path/cover-up/tests/coverage_tests.rb (144): call
+/path/cover-up/tests/coverage_tests.rb (145): line
+/path/cover-up/tests/coverage_tests.rb (146): return
+
+You can of course log the information in any way you'd like, by writing a custom logger handler and passing that into the code coverage options.
